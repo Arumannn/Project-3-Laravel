@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Take extends Model {
+class Grade extends Model
+{
     use HasFactory;
 
-    protected $table = 'takes';
-    protected $fillable = ['student_id', 'course_id', 'enroll_date'];
+    protected $fillable = ['student_id', 'course_id', 'grade', 'semester'];
 
     public function student()
     {
@@ -20,5 +20,4 @@ class Take extends Model {
     {
         return $this->belongsTo(Course::class, 'course_id');
     }
-
 }
