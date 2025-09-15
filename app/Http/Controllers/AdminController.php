@@ -8,6 +8,8 @@ use App\Models\Student;
 use App\Models\Take;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
 
 class AdminController extends Controller
 {
@@ -53,34 +55,53 @@ class AdminController extends Controller
         return view('admin.create-user');
     }
 
-    public function storeUser(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|unique:users',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'role' => 'required|in:admin,student',
-            'full_name' => 'required|string|max:255',
-            'entry_year' => 'required_if:role,student|integer'
-        ]);
+ public function storeUser(Request $request)
+{
+    $rules = [
+    'username'   => 'required|string|unique:users,username|max:255',
+    'email'      => 'required|email|unique:users,email',
+    'password'   => 'required|min:6',
+    'role'       => 'required|in:admin,student',
+    'full_name'  => 'required|string|max:255',
+];
 
+    if ($request->role === 'student') {
+        $rules['entry_year'] = 'required|integer|min:2000|max:' . (date('Y') + 1);
+    }
+
+    $request->validate($rules);
+
+    DB::beginTransaction();
+    try {
+        // Buat user
         $user = User::create([
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'username'  => $request->username,
+            'email'     => $request->email,  
+            'password'  => Hash::make($request->password),
+            'role'      => $request->role,
             'full_name' => $request->full_name
         ]);
 
+        // Jika role adalah student, buat record student
         if ($request->role === 'student') {
             Student::create([
-                'user_id' => $user->user_id,
+                'user_id'    => $user->id,   
                 'entry_year' => $request->entry_year
             ]);
         }
 
+        DB::commit();
         return redirect()->route('admin.users')->with('success', 'User created successfully');
+        
+    } catch (\Exception $e) {
+        DB::rollback();
+        return redirect()->back()
+            ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()])
+            ->withInput();
     }
+}
+
+
 
     public function grades()
     {
