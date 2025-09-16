@@ -109,15 +109,23 @@ class AdminController extends Controller
         return view('admin.grades', compact('takes'));
     }
 
-    public function assignGrade(Request $request, $takeId)
+        public function assignGrade(Request $request, $takeId)
     {
-        $request->validate([
-            'grade' => 'required|numeric|min:0|max:100'
+        // Validasi input
+        $validated = $request->validate([
+            'grade' => ['required', 'numeric', 'between:0,4'],
         ]);
 
+        // Ambil data take berdasarkan ID
         $take = Take::findOrFail($takeId);
-        $take->update(['grade' => $request->grade]);
 
-        return redirect()->back()->with('success', 'Grade assigned successfully');
+        // Update grade
+        $take->grade = $validated['grade'];
+        $take->save();
+
+        // Redirect dengan pesan sukses
+        return redirect()
+            ->back()
+            ->with('success', 'Grade assigned successfully.');
     }
 }
