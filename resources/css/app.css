@@ -1,3 +1,21 @@
+/* File: resources/css/app.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .card {
+        @apply bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    }
+    .card-title {
+        @apply text-xl font-bold text-academic-blue-dark pb-3 mb-4 border-b border-gray-200;
+    }
+    .btn {
+        @apply inline-block font-semibold py-3 px-6 rounded-lg transition-all duration-300 text-center shadow-sm;
+    }
+    .btn-primary {
+        @apply bg-academic-indigo text-white hover:bg-academic-indigo-dark hover:-translate-y-0.5;
+    }
+}

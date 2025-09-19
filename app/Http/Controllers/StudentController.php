@@ -12,13 +12,23 @@ class StudentController extends Controller
     public function dashboard()
     {
         $student = Auth::user()->student;
-        $enrolledCourses = $student->courses()->count();
+
+        // Fetching the data for the cards
+        $enrolledCoursesCount = $student->courses()->count();
         $totalCredits = $student->courses()->sum('credits');
-        $averageGrade = Take::where('student_id', $student->student_id)
-                          ->whereNotNull('grade')
-                          ->avg('grade');
-        
-        return view('student.dashboard', compact('enrolledCourses', 'totalCredits', 'averageGrade'));
+
+        // Fetch the list of enrolled courses for the "My Courses" card
+        $enrolledCourses = $student->courses()->orderBy('course_name')->get();
+
+        // Fetch recent grades for the "Recent Grades" card
+        $recentGrades = Take::with('course')
+                            ->where('student_id', $student->student_id)
+                            ->whereNotNull('grade')
+                            ->orderBy('updated_at', 'desc')
+                            ->limit(5) // Get the 5 most recent grades
+                            ->get();
+
+        return view('student.dashboard', compact('enrolledCoursesCount', 'totalCredits', 'enrolledCourses', 'recentGrades'));
     }
 
     public function courses()
@@ -37,7 +47,7 @@ class StudentController extends Controller
     public function enroll(Request $request, $courseId)
     {
         $student = Auth::user()->student;
-        
+
         Take::create([
             'student_id' => $student->student_id,
             'course_id' => $courseId,

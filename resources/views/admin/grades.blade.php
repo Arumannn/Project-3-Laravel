@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl leading-tight">
             {{ __('Manage Grades') }}
         </h2>
     </x-slot>
@@ -13,12 +13,12 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-auto">
                             <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                <tr class="bg-gray-100">
                                     <th class="px-4 py-2 text-left">Student Name</th>
                                     <th class="px-4 py-2 text-left">Course</th>
                                     <th class="px-4 py-2 text-left">Enroll Date</th>
@@ -47,7 +47,7 @@
                                             @csrf
                                             <input type="number" name="grade" min="0" max="100" step="0.01" 
                                                    value="{{ $take->grade }}" placeholder="Grade"
-                                                   class="w-20 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 text-sm mr-2">
+                                                   class="w-20 rounded-md border-gray-300 dark:border-gray-700 text-sm mr-2">
                                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">
                                                 Assign
                                             </button>

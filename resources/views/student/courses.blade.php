@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl leading-tight">
             {{ __('My Courses') }}
         </h2>
     </x-slot>
@@ -15,8 +15,8 @@
 
             <!-- Available Courses Section -->
             <div class="mb-8">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Available Courses</h3>
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <h3 class="text-xl font-semibold mb-4">Available Courses</h3>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         @if($availableCourses->count() > 0)
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -42,14 +42,14 @@
 
             <!-- Enrolled Courses Section -->
             <div>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">My Enrolled Courses</h3>
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <h3 class="text-xl font-semibold mb-4">My Enrolled Courses</h3>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         @if($enrolledCourses->count() > 0)
                             <div class="overflow-x-auto">
                                 <table class="min-w-full table-auto">
                                     <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
+                                        <tr class="bg-gray-100 ">
                                             <th class="px-4 py-2 text-left">Course Name</th>
                                             <th class="px-4 py-2 text-left">Credits</th>
                                             <th class="px-4 py-2 text-left">Enrolled Date</th>

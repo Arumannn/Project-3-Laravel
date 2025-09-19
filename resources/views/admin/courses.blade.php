@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800  leading-tight">
                 {{ __('Manage Courses') }}
             </h2>
             <a href="{{ route('admin.courses.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -18,12 +18,12 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-auto">
                             <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                <tr class="bg-gray-100 ">
                                     <th class="px-4 py-2 text-left">Course ID</th>
                                     <th class="px-4 py-2 text-left">Course Name</th>
                                     <th class="px-4 py-2 text-left">Credits</th>
@@ -33,7 +33,7 @@
                             </thead>
                             <tbody>
                                 @foreach($courses as $course)
-                                <tr class="border-b dark:border-gray-600">
+                                <tr class="border-b ">
                                     <td class="px-4 py-2">{{ $course->course_id }}</td>
                                     <td class="px-4 py-2">{{ $course->course_name }}</td>
                                     <td class="px-4 py-2">{{ $course->credits }}</td>

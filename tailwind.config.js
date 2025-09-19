@@ -12,8 +12,17 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'academic': {
+                    'blue-dark': '#1a237e',
+                    'blue-light': '#e8eaf6',
+                    'indigo': '#3f51b5',
+                    'indigo-dark': '#303f9f',
+                    'bg': '#f0f4f8',
+                }
+            }
         },
     },
 
