@@ -85,16 +85,19 @@
     </div>
 
     <script>
-        document.getElementById('role').addEventListener('change', function() {
-            const entryYearField = document.getElementById('entry_year_field');
-            const entryYearInput = document.getElementById('entry_year');
-            if (this.value === 'student') {
-                entryYearField.style.display = 'block';
-                entryYearInput.required = true;
-            } else {
-                entryYearField.style.display = 'none';
-                entryYearInput.required = false;
-            }
-        });
-    </script>
+    document.getElementById('role').addEventListener('change', function() {
+        // Mengakses field "Entry Year" menggunakan ID
+        const entryYearField = document.getElementById('entry_year_field');
+        const entryYearInput = document.getElementById('entry_year');
+
+        // Memanipulasi style (CSS) dari elemen
+        if (this.value === 'student') {
+            entryYearField.style.display = 'block'; // Tampilkan elemen
+            entryYearInput.required = true;
+        } else {
+            entryYearField.style.display = 'none'; // Sembunyikan elemen
+            entryYearInput.required = false;
+        }
+    });
+</script>
 </x-app-layout>
