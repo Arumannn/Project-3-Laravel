@@ -15,6 +15,9 @@ class StudentController extends Controller
 
         // Fetching the data for the cards
         $enrolledCoursesCount = $student->courses()->count();
+        
+        // === PERBAIKAN DI SINI ===
+        // Mengubah 'sks' menjadi 'credits' agar sesuai dengan nama kolom di database
         $totalCredits = $student->courses()->sum('credits');
 
         // Fetch the list of enrolled courses for the "My Courses" card
@@ -25,7 +28,7 @@ class StudentController extends Controller
                             ->where('student_id', $student->student_id)
                             ->whereNotNull('grade')
                             ->orderBy('updated_at', 'desc')
-                            ->limit(5) // Get the 5 most recent grades
+                            ->limit(5)
                             ->get();
 
         return view('student.dashboard', compact('enrolledCoursesCount', 'totalCredits', 'enrolledCourses', 'recentGrades'));

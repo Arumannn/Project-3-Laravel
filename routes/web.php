@@ -43,8 +43,15 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 Route::middleware(['auth', 'verified', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
     Route::get('/courses', [StudentController::class, 'courses'])->name('courses');
-    Route::post('/courses/{course}/enroll', [StudentController::class, 'enroll'])->name('enroll');
+    // Hapus route enroll yang lama, karena kita ganti dengan sistem checklist
+    // Route::post('/courses/{course}/enroll', [StudentController::class, 'enroll'])->name('enroll');
     Route::get('/grades', [StudentController::class, 'grades'])->name('grades');
+
+    // === ROUTE BARU UNTUK ENROLLMENT DENGAN CHECKLIST ===
+    // Rute untuk menampilkan form pemilihan mata kuliah
+    Route::get('/enroll', [StudentController::class, 'createEnrollment'])->name('enroll.create');
+    // Rute untuk menyimpan data mata kuliah yang dipilih
+    Route::post('/enroll', [StudentController::class, 'storeEnrollment'])->name('enroll.store');
 });
 
 // Profile Routes (available to both admin and student)
