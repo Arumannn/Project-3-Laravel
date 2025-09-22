@@ -39,9 +39,16 @@
                                     <td class="px-4 py-2">{{ $course->credits }}</td>
                                     <td class="px-4 py-2">{{ $course->students_count }}</td>
                                     <td class="px-4 py-2">
-                                        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">
-                                            Delete
-                                        </button>
+                                        <a href="{{ route('admin.courses.edit', $course) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-sm">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.courses.destroy', $course) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm" onclick="return confirm('Are you sure you want to delete this course?')">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @endforeach

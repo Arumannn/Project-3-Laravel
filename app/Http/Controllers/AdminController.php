@@ -2,35 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Course;
-use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Take;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\DB;
+
 
 class AdminController extends Controller
 {
-    // === METHOD YANG DIPERBAIKI ===
     public function dashboard()
     {
-        // Menghitung total user berdasarkan role
-        $totalStudent = User::where('role', 'student')->count();
-        $totalAdmin = User::where('role', 'admin')->count();
-        
-        // Menghitung total mata kuliah
+        $totalStudents = User::where('role', 'student')->count();
         $totalCourses = Course::count();
+        $totalEnrollments = Take::count();
+        $recentEnrollments = Take::with('student.user', 'course')->latest()->take(5)->get();
 
-        // Mengirimkan semua data statistik ke view
-        return view('admin.dashboard', compact('totalStudent', 'totalAdmin', 'totalCourses'));
+        return view('admin.dashboard', compact('totalStudents', 'totalCourses', 'totalEnrollments', 'recentEnrollments'));
     }
 
     public function courses()
     {
-        // Anda mungkin perlu menambahkan logika untuk menampilkan daftar course di sini
-        $courses = Course::all();
+        $courses = Course::withCount('students')->get();
         return view('admin.courses', compact('courses'));
     }
 
@@ -43,22 +38,42 @@ class AdminController extends Controller
     {
         $request->validate([
             'course_name' => 'required|string|max:255',
+            'credits' => 'required|integer|min:1'
+        ]);
+
+        Course::create($request->all());
+        return redirect()->route('admin.courses')->with('success', 'Course created successfully');
+    }
+    
+    public function editCourse(Course $course)
+    {
+        return view('admin.edit-course', compact('course'));
+    }
+
+    public function updateCourse(Request $request, Course $course)
+    {
+        $request->validate([
+            'course_name' => 'required|string|max:255',
             'credits' => 'required|integer|min:1',
         ]);
-    
-        Course::create([
-            'course_name' => $request->course_name,
-            'credits' => $request->credits,
-        ]);
-    
-        return redirect()->route('admin.courses')->with('success', 'Course created successfully.');
+
+        $course->update($request->all());
+
+        return redirect()->route('admin.courses')->with('success', 'Course updated successfully.');
     }
+
+    public function destroyCourse(Course $course)
+    {
+        $course->delete();
+
+        return redirect()->route('admin.courses')->with('success', 'Course deleted successfully.');
+    }
+
 
     public function users()
     {
-        $students = User::where('role', 'student')->with('student')->get();
-        $admins = User::where('role', 'admin')->get();
-        return view('admin.users', compact('students', 'admins'));
+        $users = User::with('student')->get();
+        return view('admin.users', compact('users'));
     }
 
     public function createUser()
@@ -66,36 +81,78 @@ class AdminController extends Controller
         return view('admin.create-user');
     }
 
-    public function storeUser(Request $request)
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:admin,student'],
-            'nim' => ['required_if:role,student', 'nullable', 'string', 'unique:students,nim'],
-            'entry_year' => ['required_if:role,student', 'nullable', 'digits:4', 'integer', 'min:1900'],
-        ]);
+ public function storeUser(Request $request)
+{
+    $rules = [
+    'username'   => 'required|string|unique:users,username|max:255',
+    'email'      => 'required|email|unique:users,email',
+    'password'   => 'required|min:6',
+    'role'       => 'required|in:admin,student',
+    'full_name'  => 'required|string|max:255',
+];
 
+    if ($request->role === 'student') {
+        $rules['entry_year'] = 'required|integer|min:2000|max:' . (date('Y') + 1);
+    }
+
+    $request->validate($rules);
+
+    DB::beginTransaction();
+    try {
+        // Buat user
         $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'username'  => $request->username,
+            'email'     => $request->email,  
+            'password'  => Hash::make($request->password),
+            'role'      => $request->role,
+            'full_name' => $request->full_name
         ]);
 
+        // Jika role adalah student, buat record student
         if ($request->role === 'student') {
             Student::create([
-                'user_id' => $user->id,
-                'nim' => $request->nim,
-                'entry_year' => $request->entry_year,
+                'user_id'    => $user->user_id,   
+                'entry_year' => $request->entry_year
             ]);
         }
 
-        return redirect()->route('admin.users')->with('success', 'User created successfully.');
+        DB::commit();
+        return redirect()->route('admin.users')->with('success', 'User created successfully');
+        
+    } catch (\Exception $e) {
+        DB::rollback();
+        return redirect()->back()
+            ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()])
+            ->withInput();
     }
+}
+
+    public function editUser(User $user)
+    {
+        return view('admin.edit-user', compact('user'));
+    }
+
+    public function updateUser(Request $request, User $user)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->user_id . ',user_id',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
+        ]);
+
+        $user->update($request->all());
+
+        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+    }
+
+    public function destroyUser(User $user)
+    {
+        $user->delete();
+
+        return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
+    }
+
+
 
     public function grades()
     {
@@ -103,14 +160,23 @@ class AdminController extends Controller
         return view('admin.grades', compact('takes'));
     }
 
-    public function assignGrade(Request $request, Take $take)
+        public function assignGrade(Request $request, $takeId)
     {
-        $request->validate([
-            'grade' => 'required|numeric|min:0|max:100',
+        // Validasi input
+        $validated = $request->validate([
+            'grade' => ['required', 'numeric', 'between:0,4'],
         ]);
 
-        $take->update(['grade' => $request->grade]);
+        // Ambil data take berdasarkan ID
+        $take = Take::findOrFail($takeId);
 
-        return redirect()->back()->with('success', 'Grade assigned successfully.');
+        // Update grade
+        $take->grade = $validated['grade'];
+        $take->save();
+
+        // Redirect dengan pesan sukses
+        return redirect()
+            ->back()
+            ->with('success', 'Grade assigned successfully.');
     }
 }
