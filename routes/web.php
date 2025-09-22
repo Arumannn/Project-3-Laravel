@@ -43,8 +43,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 Route::middleware(['auth', 'verified', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
     Route::get('/courses', [StudentController::class, 'courses'])->name('courses');
-    // Hapus route enroll yang lama, karena kita ganti dengan sistem checklist
-    // Route::post('/courses/{course}/enroll', [StudentController::class, 'enroll'])->name('enroll');
+    Route::post('/courses/enroll', [StudentController::class, 'enrollBatch'])->name('enroll.batch');
     Route::get('/grades', [StudentController::class, 'grades'])->name('grades');
 
     // === ROUTE BARU UNTUK ENROLLMENT DENGAN CHECKLIST ===

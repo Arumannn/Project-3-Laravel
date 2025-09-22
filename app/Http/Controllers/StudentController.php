@@ -69,4 +69,25 @@ class StudentController extends Controller
 
         return view('student.grades', compact('grades'));
     }
+
+    public function enrollBatch(Request $request)
+{
+    $request->validate([
+        'courses' => 'required|array|min:1',
+        'courses.*' => 'exists:courses,course_id',
+    ]);
+
+    $student = Auth::user()->student;
+    $courses = $request->input('courses');
+
+    foreach ($courses as $courseId) {
+        Take::create([
+            'student_id' => $student->student_id,
+            'course_id' => $courseId,
+            'enroll_date' => now()
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Successfully enrolled in selected courses');
+}
 }
